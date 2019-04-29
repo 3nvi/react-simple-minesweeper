@@ -1,0 +1,15 @@
+import { connect } from 'react-redux';
+import { GAME_STATUSES as statuses } from 'utils/constants';
+import { getGameStatus, openCell } from 'ducks/game';
+import MsGridCell from './MsGridCell';
+
+const mapStateToProps = state => ({
+  gameInProgress: getGameStatus(state) === statuses.GAME_IN_PROGRESS,
+});
+
+const mapDispatchToProps = { openCell };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(MsGridCell);
