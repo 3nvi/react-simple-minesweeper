@@ -209,7 +209,7 @@ describe('LandingPage', () => {
     // click on the "exit" button
     fireEvent.click(queries.getByTitle(/back to home/i));
 
-    // expect to see the form again and no timers
+    // expect to see the form again
     expect(queries.getByLabelText(/number of rows/i)).toBeTruthy();
     expect(queries.getByLabelText(/number of columns/i)).toBeTruthy();
     expect(queries.getByLabelText(/number of mines/i)).toBeTruthy();
@@ -235,14 +235,14 @@ describe('LandingPage', () => {
     // click on the "retry" button
     fireEvent.click(queries.getByTitle(/retry/i));
 
-    // calculate the number of cells with numbers and expect them to be 0, since
-    // all the cells should be closed after the "retry" button was clicked
-    // (since we clicked on something)
+    // calculate the number of cells without numbers and expect them to match the total,
+    // cell number, since all the cells should be closed after the "retry" button was clicked (thus
+    // no number should be visible to the user).
     const hiddenCells = queries.getAllByTestId(/ms-grid-cell/).filter(cell => !cell.innerHTML)
       .length;
     expect(hiddenCells).toEqual(2 * 2);
 
-    // read the timer value and expect it to equal 00:00, since we resetted
+    // read the timer value and expect it to equal 00:00, since we resetted the game
     timerValue = queries.container.querySelector('time').innerHTML;
     expect(timerValue).toMatch('00:00');
   });
