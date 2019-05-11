@@ -36,21 +36,46 @@ const Cell = styled.button`
 `;
 
 function MsGridCell(props) {
-  const { cell, openCell, gameInProgress } = props;
+  const { cell, openCell, toggleFlagCell, gameInProgress, flagsExhausted } = props;
 
   // when a user clicks a cell, we only perform the `openCell` action if a
   // game is still ongoing (i.e. has not finished) and the cell was not already
-  // opened.
-  const handleClick = useCallback(() => {
-    if (!cell.opened && gameInProgress) {
+  // opened or flagged (if it's flagged we first want to remove the flag).
+  const handleLeftClick = useCallback(() => {
+    if (!cell.opened && !cell.flagged && gameInProgress) {
       openCell({ cellIndex: cell.index, isUserActivity: true });
     }
   }, [gameInProgress, cell, openCell]);
+
+  // when a user clicks a cell, we first check if a
+  // game is still ongoing (i.e. has not finished) and the cell was not already
+  // opened. If that's true, then we make sure to either always allow the
+  // "removal" of a flag, but only allow an addition IF there are flags remaining
+  // (i.e. the total number of flags is not exhausted yet)
+
+  const handleRightClick = useCallback(
+    e => {
+      e.preventDefault();
+
+      if (!cell.opened && gameInProgress) {
+        if (cell.flagged || !flagsExhausted) {
+          toggleFlagCell({ cellIndex: cell.index });
+        }
+      }
+    },
+    [gameInProgress, cell, toggleFlagCell, flagsExhausted]
+  );
 
   // We display a "bomb" when we are in a cell that contains a mine, nothing
   // when no mines are near this cell or the number of neighbouring mines (if
   // the cell has at least 1 around it)
   const renderedValue = useMemo(() => {
+    // if the cell is not open, either render nothing or a flag (if the cell is flagged)
+    if (!cell.opened) {
+      return cell.flagged ? '🏁' : null;
+    }
+
+    // if the cell is opened, display the correct neighbouring mine number
     switch (cell.neighbouringMines) {
       case -1:
         return '💣';
@@ -59,23 +84,26 @@ function MsGridCell(props) {
       default:
         return cell.neighbouringMines;
     }
-  }, [cell.neighbouringMines]);
+  }, [cell.opened, cell.flagged, cell.neighbouringMines]);
 
   return (
     <Cell
-      onClick={handleClick}
+      onClick={handleLeftClick}
+      onContextMenu={handleRightClick}
       cellData={cell}
       gameInProgress={gameInProgress}
       data-testid={`ms-grid-cell--${cell.index}`}
     >
-      {cell.opened && renderedValue}
+      {renderedValue}
     </Cell>
   );
 }
 
 MsGridCell.reduxProps = {
   gameInProgress: PropTypes.bool.isRequired,
+  flagsExhausted: PropTypes.bool.isRequired,
   openCell: PropTypes.func.isRequired,
+  toggleFlagCell: PropTypes.func.isRequired,
 };
 
 MsGridCell.propTypes = {

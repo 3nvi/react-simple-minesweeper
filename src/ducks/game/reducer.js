@@ -43,6 +43,9 @@ function gameReducer(state = initialState, action) {
           // whether the cell was opened or not
           opened: false,
 
+          // whether the cell was flagged or not
+          flagged: false,
+
           // the index of the cell within the array (it helps a lot since we
           // don't have any other uniqueID for a cell)
           index,
@@ -75,6 +78,22 @@ function gameReducer(state = initialState, action) {
                 ...cell,
                 fromUserActivity: action.payload.isUserActivity,
                 opened: true,
+                timestamp: state.elapsedTime,
+              }
+            : cell
+        ),
+      };
+
+    // toggles the cells as flagged
+    case types.FLAG_CELL_TOGGLE:
+      return {
+        ...state,
+        grid: state.grid.map((cell, index) =>
+          index === action.payload.cellIndex
+            ? {
+                ...cell,
+                flagged: !cell.flagged,
+                fromUserActivity: true,
                 timestamp: state.elapsedTime,
               }
             : cell

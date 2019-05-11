@@ -5,6 +5,7 @@ import {
   REPEAT_GAME,
   CONSTRUCT_GRID,
   SELECT_CELL,
+  FLAG_CELL_TOGGLE,
   FINISH_GAME,
   TICK_GAME_TIME,
 } from './types';
@@ -43,3 +44,6 @@ export const tickGameTime = milliseconds => simpleAction(TICK_GAME_TIME, { milli
 // *** See `src/middlewares/handleOpenCell.js` ***
 export const openCell = ({ cellIndex, isUserActivity }) =>
   simpleAction(SELECT_CELL, { cellIndex, isUserActivity });
+
+// mark a cell as a potential candidate for a bomb, by placing a flag on it
+export const toggleFlagCell = ({ cellIndex }) => simpleAction(FLAG_CELL_TOGGLE, { cellIndex });

@@ -91,10 +91,18 @@ const IconButton = styled.button`
   }
 `;
 
+const GameDataWrapper = styled.div`
+  display: flex;
+
+  > * {
+    margin: 0 15px;
+  }
+`;
+
 /**
  * The Header component that you see overlaying while you play a game
  */
-function MsResultsModal({ gameStatus, repeatGame, resetGame }) {
+function MsResultsModal({ gameStatus, repeatGame, resetGame, remainingFlagCount }) {
   return (
     <ResultsModalWrapper data-testid="ms-results-modal">
       <IconButtonContainer>
@@ -112,13 +120,17 @@ function MsResultsModal({ gameStatus, repeatGame, resetGame }) {
         {gameStatus === statuses.GAME_WON && <WinText>You won!</WinText>}
         {gameStatus === statuses.GAME_OVER && <LossText>Game Over</LossText>}
       </ResultsModalInner>
-      <MsTimer />
+      <GameDataWrapper>
+        <div>Remaining Flags: {remainingFlagCount}</div>
+        <MsTimer />
+      </GameDataWrapper>
     </ResultsModalWrapper>
   );
 }
 
 MsResultsModal.reduxProps = {
   gameStatus: PropTypes.oneOf(Object.values(statuses)),
+  remainingFlagCount: PropTypes.number.isRequired,
   repeatGame: PropTypes.func.isRequired,
   resetGame: PropTypes.func.isRequired,
 };

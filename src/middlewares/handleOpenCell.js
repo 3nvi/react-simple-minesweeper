@@ -41,7 +41,7 @@ const handleOpenCell = store => next => action => {
     } else if (selectedCell.neighbouringMines === 0) {
       const neighbouringCells = findNeighbouringCells(grid, cellIndex, columnCount);
       neighbouringCells.forEach(cell => {
-        if (!cell.opened) {
+        if (!cell.opened && !cell.flagged) {
           store.dispatch(openCell({ cellIndex: cell.index, isUserActivity: false }));
         }
       });

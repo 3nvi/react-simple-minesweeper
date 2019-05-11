@@ -1,7 +1,14 @@
 import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import styled from '@emotion/styled';
+import { ReactComponent as ClockSVG } from 'assets/time.svg';
 import { formatTime } from 'utils/common';
 import { GAME_STATUSES as statuses } from 'utils/constants';
+
+const TimerWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 function MsTimer({ elapsedTime, gameStatus, tickGameTime }) {
   // we need a solid reference between re-renders
@@ -28,7 +35,12 @@ function MsTimer({ elapsedTime, gameStatus, tickGameTime }) {
     };
   }, [gameStatus, tickGameTime]);
 
-  return <time>{formatTime(elapsedTime)}</time>;
+  return (
+    <TimerWrapper>
+      <ClockSVG />
+      <time>{formatTime(elapsedTime)}</time>
+    </TimerWrapper>
+  );
 }
 
 MsTimer.reduxProps = {

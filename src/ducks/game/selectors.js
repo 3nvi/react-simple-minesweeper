@@ -8,3 +8,5 @@ export const getColumnCount = state => getReduxStateSlice(state).columnCount;
 export const getMineCount = state => getReduxStateSlice(state).mineCount;
 export const getGameStatus = state => getReduxStateSlice(state).gameStatus;
 export const getElapsedGameTime = state => getReduxStateSlice(state).elapsedTime;
+export const getFlaggedCellCount = state =>
+  getGameGrid(state) && getGameGrid(state).filter(cell => cell.flagged).length;
