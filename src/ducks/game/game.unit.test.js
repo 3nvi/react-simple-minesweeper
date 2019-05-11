@@ -34,6 +34,7 @@ describe('Game Duck', () => {
     store.dispatch(createGame({ rowCount: 2, columnCount: 2, mineCount: 1 }));
     expect(getGameGrid(store.getState())).toEqual(
       [...Array(2 * 2)].map((__, index) => ({
+        flagged: false,
         neighbouringMines: undefined,
         opened: false,
         index,

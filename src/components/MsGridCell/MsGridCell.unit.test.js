@@ -5,6 +5,7 @@ import MsGridCell, { minesToColorArray } from './MsGridCell';
 describe('MsGridCell', () => {
   const baseCell = {
     index: 0,
+    flagged: false,
     fromUserActivity: false,
     timestamp: 0,
   };
@@ -16,6 +17,8 @@ describe('MsGridCell', () => {
         cell={{ ...baseCell, neighbouringMines: -1, opened: true }}
         gameInProgress
         openCell={jest.fn()}
+        toggleFlagCell={jest.fn()}
+        flagsExhausted={false}
       />
     );
     expect(getByText('💣')).toBeTruthy();
@@ -26,6 +29,8 @@ describe('MsGridCell', () => {
         cell={{ ...baseCell, neighbouringMines: 0, opened: true }}
         gameInProgress
         openCell={jest.fn()}
+        toggleFlagCell={jest.fn()}
+        flagsExhausted={false}
       />
     );
     expect(getByText('', { selector: 'button' })).toBeTruthy();
@@ -36,6 +41,8 @@ describe('MsGridCell', () => {
         cell={{ ...baseCell, neighbouringMines: 1, opened: true }}
         gameInProgress
         openCell={jest.fn()}
+        toggleFlagCell={jest.fn()}
+        flagsExhausted={false}
       />
     );
     expect(getByText('1')).toBeTruthy();
@@ -46,6 +53,8 @@ describe('MsGridCell', () => {
         cell={{ ...baseCell, neighbouringMines: 1, opened: false }}
         gameInProgress
         openCell={jest.fn()}
+        toggleFlagCell={jest.fn()}
+        flagsExhausted={false}
       />
     );
     expect(getByText('', { selector: 'button' })).toBeTruthy();
@@ -58,11 +67,15 @@ describe('MsGridCell', () => {
           cell={{ ...baseCell, neighbouringMines: 1, opened: true }}
           gameInProgress
           openCell={jest.fn()}
+          toggleFlagCell={jest.fn()}
+          flagsExhausted={false}
         />
         <MsGridCell
           cell={{ ...baseCell, neighbouringMines: 2, opened: true }}
           gameInProgress
           openCell={jest.fn()}
+          toggleFlagCell={jest.fn()}
+          flagsExhausted={false}
         />
       </div>
     );
@@ -81,11 +94,15 @@ describe('MsGridCell', () => {
           cell={{ ...baseCell, neighbouringMines: 1, opened: false }}
           gameInProgress
           openCell={jest.fn()}
+          toggleFlagCell={jest.fn()}
+          flagsExhausted={false}
         />
         <MsGridCell
           cell={{ ...baseCell, neighbouringMines: 2, opened: true }}
           gameInProgress
           openCell={jest.fn()}
+          toggleFlagCell={jest.fn()}
+          flagsExhausted={false}
         />
       </div>
     );
@@ -100,6 +117,8 @@ describe('MsGridCell', () => {
         cell={{ ...baseCell, neighbouringMines: -1, fromUserActivity: true, opened: true }}
         gameInProgress
         openCell={jest.fn()}
+        toggleFlagCell={jest.fn()}
+        flagsExhausted={false}
       />
     );
     expect(getComputedStyle(getByText('💣')).getPropertyValue('background-color')).toEqual('red');
@@ -112,6 +131,8 @@ describe('MsGridCell', () => {
         cell={{ ...baseCell, opened: false, neighbouringMines: 1 }}
         gameInProgress={false}
         openCell={openCellMock}
+        toggleFlagCell={jest.fn()}
+        flagsExhausted={false}
       />
     );
 
@@ -126,6 +147,8 @@ describe('MsGridCell', () => {
         cell={{ ...baseCell, neighbouringMines: 2, opened: true }}
         gameInProgress
         openCell={openCellMock}
+        toggleFlagCell={jest.fn()}
+        flagsExhausted={false}
       />
     );
 
@@ -140,6 +163,8 @@ describe('MsGridCell', () => {
         cell={{ ...baseCell, neighbouringMines: 1, opened: false }}
         gameInProgress
         openCell={openCellMock}
+        toggleFlagCell={jest.fn()}
+        flagsExhausted={false}
       />
     );
 
@@ -149,5 +174,66 @@ describe('MsGridCell', () => {
       cellIndex: baseCell.index,
       isUserActivity: true,
     });
+  });
+
+  it('displays a flag if the cell is flagged and not opened', () => {
+    // -1 means mine
+    const { getByText } = render(
+      <MsGridCell
+        cell={{ ...baseCell, neighbouringMines: 1, flagged: true, opened: false }}
+        gameInProgress
+        openCell={jest.fn()}
+        toggleFlagCell={jest.fn()}
+        flagsExhausted={false}
+      />
+    );
+    expect(getByText('🏁')).toBeTruthy();
+  });
+
+  it('displays the mine count if the cell is flagged but opened', () => {
+    // -1 means mine
+    const { queryByText } = render(
+      <MsGridCell
+        cell={{ ...baseCell, neighbouringMines: 1, flagged: true, opened: true }}
+        gameInProgress
+        openCell={jest.fn()}
+        toggleFlagCell={jest.fn()}
+        flagsExhausted={false}
+      />
+    );
+    expect(queryByText('🏁')).toBeFalsy();
+    expect(queryByText('1')).toBeTruthy();
+  });
+
+  it('calls `toggleFlagCell` on a right-click if flags are available', () => {
+    const toggleFlagCellMock = jest.fn();
+    const { queryByText } = render(
+      <MsGridCell
+        cell={{ ...baseCell, neighbouringMines: 1, opened: false }}
+        gameInProgress
+        openCell={jest.fn()}
+        toggleFlagCell={toggleFlagCellMock}
+        flagsExhausted={false}
+      />
+    );
+    fireEvent.contextMenu(queryByText('', { selector: 'button' }));
+
+    expect(toggleFlagCellMock.mock.calls.length).toEqual(1);
+  });
+
+  it('does not call `toggleFlagCell` on a right-click if no flags are available', () => {
+    const toggleFlagCellMock = jest.fn();
+    const { queryByText } = render(
+      <MsGridCell
+        cell={{ ...baseCell, neighbouringMines: 1, opened: false }}
+        gameInProgress
+        openCell={jest.fn()}
+        toggleFlagCell={toggleFlagCellMock}
+        flagsExhausted={true}
+      />
+    );
+    fireEvent.contextMenu(queryByText('', { selector: 'button' }));
+
+    expect(toggleFlagCellMock.mock.calls.length).toEqual(0);
   });
 });

@@ -15,6 +15,7 @@ describe('MsResultsModal', () => {
         gameStatus={statuses.GAME_IN_PROGRESS}
         repeatGame={repeatGameMock}
         resetGame={resetGameMock}
+        remainingFlagCount={0}
       />
     );
 
@@ -31,6 +32,7 @@ describe('MsResultsModal', () => {
         gameStatus={statuses.GAME_IN_PROGRESS}
         repeatGame={jest.fn()}
         resetGame={jest.fn()}
+        remainingFlagCount={0}
       />
     );
 
@@ -40,7 +42,12 @@ describe('MsResultsModal', () => {
   it('renders the proper text depending on the game state', () => {
     // expect to not see victory-related text if the user won the game
     const { getByText, queryByText, rerender } = render(
-      <MsResultsModal gameStatus={statuses.GAME_WON} repeatGame={jest.fn()} resetGame={jest.fn()} />
+      <MsResultsModal
+        gameStatus={statuses.GAME_WON}
+        repeatGame={jest.fn()}
+        resetGame={jest.fn()}
+        remainingFlagCount={0}
+      />
     );
     expect(getByText(/You won/i)).toBeTruthy();
 
@@ -50,6 +57,7 @@ describe('MsResultsModal', () => {
         gameStatus={statuses.GAME_OVER}
         repeatGame={jest.fn()}
         resetGame={jest.fn()}
+        remainingFlagCount={0}
       />
     );
     expect(getByText(/game over/i)).toBeTruthy();
@@ -60,9 +68,22 @@ describe('MsResultsModal', () => {
         gameStatus={statuses.GAME_IN_PROGRESS}
         repeatGame={jest.fn()}
         resetGame={jest.fn()}
+        remainingFlagCount={0}
       />
     );
     expect(queryByText(/You won/i)).toBeFalsy();
     expect(queryByText(/game over/i)).toBeFalsy();
+  });
+
+  it('shows the remaning flags', () => {
+    const { getByText } = render(
+      <MsResultsModal
+        gameStatus={statuses.GAME_WON}
+        repeatGame={jest.fn()}
+        resetGame={jest.fn()}
+        remainingFlagCount={1}
+      />
+    );
+    expect(getByText(/Remaining flags: 1/i)).toBeTruthy();
   });
 });
